@@ -2,6 +2,25 @@
 #include "Ship.h"
 #include "SFMLMath.hpp"
 
+GameState::GameState(sf::RenderWindow& inWindow)
+	:mRenderWindow(inWindow),
+	mTitleFont("Resources/fonts/TitleFont.otf"),
+	mTitleText(mTitleFont),
+	mStartFont("Resources/fonts/GeneralFont.otf"),
+	mStartText(mStartFont),
+	mPlayersConnected(mStartFont),
+	mEndGameText(mStartFont)
+{
+}
+
+void GameState::Initialize()
+{
+	CreateWindow();
+
+	mCurrentState = EGameState::MainMenu;
+	InitMainMenu();
+}
+
 void GameState::Tick()
 {
 	int numJoystick = 0;
@@ -17,18 +36,17 @@ void GameState::Tick()
 	// as the input from the main menu was never getting reset without it.
 	// This poll event should only handle window and main menu events
 	// all game input is handled by the input system
-	sf::Event inputEvent;
-	while (mRenderWindow->pollEvent(inputEvent))
+	while (const std::optional inputEvent = mRenderWindow.pollEvent())
 	{
-		if (inputEvent.type == sf::Event::Closed)
+		if (inputEvent->is<sf::Event::Closed>())
 		{
 			if (mCurrentState == EGameState::InGame)
 			{
 				Game::Destroy();
 			}
-			mRenderWindow->close();
+			mRenderWindow.close();
 		}
-		else if (inputEvent.type == sf::Event::JoystickButtonPressed)
+		else if (inputEvent->is<sf::Event::JoystickButtonPressed>())
 		{
 			if (mCurrentState == EGameState::MainMenu && numJoystick >= 1)
 			{
@@ -72,19 +90,15 @@ void GameState::OnPlayerDead(PlayerState& deadPlayer)
 	mDeadPlayers.push_back(&deadPlayer);
 }
 
-void GameState::Initialize()
+void GameState::CreateWindow()
 {
-	CreateWindow();
-
-	mCurrentState = EGameState::MainMenu;
-	InitMainMenu();
+	mRenderWindow.create(sf::VideoMode(sf::Vector2u(1920, 1080)), "SpaceWarsRedux", sf::Style::Close, sf::State::Windowed);
+	mRenderWindow.setFramerateLimit(mFPSCap);
 }
 
 void GameState::InitMainMenu()
 {
-	if (mTitleFont.loadFromFile("Resources/fonts/TitleFont.otf"))
 	{
-		mTitleText.setFont(mTitleFont);
 		// got the color value from Paint
 		mTitleText.setFillColor(sf::Color(2, 153, 192));
 		mTitleText.setCharacterSize(48);
@@ -92,22 +106,18 @@ void GameState::InitMainMenu()
 		mTitleText.setString("Space Wars Redux");
 	}
 
-	if (mStartFont.loadFromFile("Resources/fonts/GeneralFont.otf"))
 	{
-		mPlayersConnected.setFont(mStartFont);
 		// got the color value from Paint
 		mPlayersConnected.setFillColor(sf::Color(2, 153, 192));
 		mPlayersConnected.setCharacterSize(24);
 		mPlayersConnected.setPosition(sf::Vector2f(960, 680));
 
-		mStartText.setFont(mStartFont);
 		// got the color value from Paint
 		mStartText.setFillColor(sf::Color(2, 153, 192));
 		mStartText.setCharacterSize(24);
 		mStartText.setPosition(sf::Vector2f(960, 720));
 		mStartText.setString("");
 
-		mEndGameText.setFont(mStartFont);
 		// got the color value from Paint
 		mEndGameText.setFillColor(sf::Color(2, 153, 192));
 		mEndGameText.setCharacterSize(48);
@@ -141,26 +151,26 @@ void GameState::UpdateMainMenu()
 
 void GameState::RenderMainMenu()
 {
-	mRenderWindow->clear(sf::Color::Black);
+	mRenderWindow.clear(sf::Color::Black);
 
-	sf::Vector2f bounds(mTitleText.getLocalBounds().width, mTitleText.getLocalBounds().height);
+	sf::Vector2f bounds = mTitleText.getLocalBounds().size;
 	mTitleText.setOrigin(bounds / 2.0f);
-	mRenderWindow->draw(mTitleText);
+	mRenderWindow.draw(mTitleText);
 
-	bounds = sf::Vector2f(mPlayersConnected.getLocalBounds().width, mPlayersConnected.getLocalBounds().height);
+	bounds = mPlayersConnected.getLocalBounds().size;
 	mPlayersConnected.setOrigin(bounds / 2.0f);
-	mRenderWindow->draw(mPlayersConnected);
+	mRenderWindow.draw(mPlayersConnected);
 	
-	bounds = sf::Vector2f(mStartText.getLocalBounds().width, mStartText.getLocalBounds().height);
+	bounds = mStartText.getLocalBounds().size;
 	mStartText.setOrigin(bounds / 2.0f);
-	mRenderWindow->draw(mStartText);
+	mRenderWindow.draw(mStartText);
 
-	mRenderWindow->display();
+	mRenderWindow.display();
 }
 
 void GameState::InitGame()
 {
-	Game* gameInstance = Game::Get(mRenderWindow->getSize());
+	Game* gameInstance = Game::Get(mRenderWindow.getSize());
 	gameInstance->LoadGameTextures("Resources/assets");
 	gameInstance->Init();
 
@@ -201,7 +211,7 @@ void GameState::UpdateGame()
 	float deltaTime = 1.f / mFPSCap;
 
 	// Updates all the systems and the game objects
-	Game::Get(mRenderWindow->getSize())->Update(deltaTime);
+	Game::Get(mRenderWindow.getSize())->Update(deltaTime);
 
 	for (PlayerState* player : mActivePlayerStates)
 	{
@@ -214,20 +224,20 @@ void GameState::UpdateGame()
 
 void GameState::RenderGame()
 {
-	mRenderWindow->clear(sf::Color::Black);
+	mRenderWindow.clear(sf::Color::Black);
 
 	const std::vector<BaseGameObject*>& currentGameObjects = Game::GetAllObjects();
 	for (BaseGameObject* object : currentGameObjects)
 	{
-		mRenderWindow->draw(object->GetSprite());
+		mRenderWindow.draw(object->GetSprite());
 	}
 
 	for (PlayerState* player : mActivePlayerStates)
 	{
-		player->RenderHud(*mRenderWindow);
+		player->RenderHud(mRenderWindow);
 	}
 
-	mRenderWindow->display();
+	mRenderWindow.display();
 }
 
 void GameState::UpdateEndGame()
@@ -239,22 +249,17 @@ void GameState::UpdateEndGame()
 
 void GameState::RenderEndGame()
 {
-	mRenderWindow->clear(sf::Color::Black);
+	mRenderWindow.clear(sf::Color::Black);
 
-	sf::Vector2f bounds;
-	bounds = sf::Vector2f(mEndGameText.getLocalBounds().width, mEndGameText.getLocalBounds().height);
+	 sf::Vector2f bounds = mEndGameText.getLocalBounds().size;
 	mEndGameText.setOrigin(bounds / 2.0f);
-	mRenderWindow->draw(mEndGameText);
+	mRenderWindow.draw(mEndGameText);
 
-	bounds = sf::Vector2f(mStartText.getLocalBounds().width, mStartText.getLocalBounds().height);
+	bounds = mStartText.getLocalBounds().size;
 	mStartText.setOrigin(bounds / 2.0f);
-	mRenderWindow->draw(mStartText);
+	mRenderWindow.draw(mStartText);
 
-	mRenderWindow->display();
+	mRenderWindow.display();
 }
 
-void GameState::CreateWindow()
-{
-	mRenderWindow = new sf::RenderWindow(sf::VideoMode(1920, 1080), "SpaceWarsRedux", sf::Style::Close);
-	mRenderWindow->setFramerateLimit(mFPSCap);
-}
+

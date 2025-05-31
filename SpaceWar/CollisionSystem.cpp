@@ -50,8 +50,7 @@ void CollisionSystem::Update(float deltaTime)
 	{
 		CollisionComponent* collisionComp = sInstance->mRegisteredComponents[i];
 		PhysiscsComponent* physComp = collisionComp->mPhysics;
-		collisionComp->mCollisionRect->left = physComp->mPosition.x - (collisionComp->mCollisionRect->width / 2);
-		collisionComp->mCollisionRect->top = physComp->mPosition.y - (collisionComp->mCollisionRect->height / 2);
+		collisionComp->mCollisionRect->position = physComp->mPosition - (collisionComp->mCollisionRect->size / 2.f);
 	}
 
 	// Check each component against each other component
@@ -84,7 +83,7 @@ void CollisionSystem::Update(float deltaTime)
 			if (sf::SquaredDistance(testPos, currentPos) < (50 * 50))
 			{
 				// now do the shape overlap check
-				if (currentComp->mCollisionRect->intersects(*testComp->mCollisionRect))
+				if (currentComp->mCollisionRect->findIntersection(*testComp->mCollisionRect))
 				{
 					// register the collision
 					currentComp->SetCollisionRegistered(testComp);

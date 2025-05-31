@@ -15,7 +15,7 @@ class PlayerState;
 class GameState
 {
 public:
-	GameState() = default;
+	GameState(sf::RenderWindow& inWindow);
 	~GameState() = default;
 
 	// Create the window and initialize the main menu
@@ -24,7 +24,7 @@ public:
 
 	// helpers and bindings
 	void OnPlayerDead(PlayerState& deadPlayer);
-	bool IsWIndowOpen() const { return mRenderWindow ? mRenderWindow->isOpen() : false; }
+	bool IsWIndowOpen() const { return mRenderWindow.isOpen(); }
 
 private:
 	void CreateWindow();
@@ -44,7 +44,7 @@ private:
 	void RenderEndGame();
 
 	EGameState mCurrentState = EGameState::MainMenu;
-	sf::RenderWindow* mRenderWindow = nullptr;
+	sf::RenderWindow& mRenderWindow;
 
 	// Main menu stuff
 	sf::Font mTitleFont;
@@ -52,7 +52,6 @@ private:
 	sf::Font mStartFont;
 	sf::Text mStartText;
 	sf::Text mPlayersConnected;
-	sf::Text mExitText;
 
 	// End game stuff
 	sf::Text mEndGameText;

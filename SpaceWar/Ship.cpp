@@ -36,7 +36,7 @@ void Ship::Init()
 void Ship::Update(float deltaTime)
 {
 	mSprite.setPosition(mPhysics.mPosition);
-	mSprite.rotate(mInputRotation * mAngularSpeed * deltaTime);
+	mSprite.rotate(sf::degrees(mInputRotation * mAngularSpeed * deltaTime));
 	
 	UpdateShipRotation();
 }
@@ -74,7 +74,7 @@ void Ship::FirePhaserShots()
 
 	shot->Init();
 	shot->SetVelocity(mForward * 500.f);
-	shot->SetRotation(mSprite.getRotation());
+	shot->SetRotation(mSprite.getRotation().asDegrees());
 	shot->IgnoreCollisionsFromObject(this);
 	IgnoreCollisionsFromObject(shot);
 }
@@ -92,13 +92,13 @@ void Ship::FireHomingMissile()
 
 	shot->Init();
 	shot->SetVelocity(mForward * 500.f);
-	shot->SetRotation(mSprite.getRotation());
+	shot->SetRotation(mSprite.getRotation().asDegrees());
 	shot->IgnoreCollisionsFromObject(this);
 	IgnoreCollisionsFromObject(shot);
 }
 
 void Ship::UpdateShipRotation()
 {
-	float spriteRotation = mSprite.getRotation();
+	float spriteRotation = mSprite.getRotation().asDegrees();
 	mForward = sf::RotationToUnitVector(spriteRotation);
 }

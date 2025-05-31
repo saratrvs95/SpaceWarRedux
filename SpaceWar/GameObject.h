@@ -1,5 +1,6 @@
 #pragma once
 #include "SFML/Graphics/Sprite.hpp"
+#include "SFML/System/Angle.hpp"
 #include "PhysicsSystem.h"
 #include "CollisionSystem.h"
 
@@ -45,11 +46,11 @@ class BaseGameObject
 {
 public:
 	BaseGameObject(const sf::Texture& texture, const sf::Vector2f& origin, sf::Vector2f startPosition)
+		:mSprite(texture)
 	{
-		mSprite.setTexture(texture);
 		mSprite.setOrigin(origin);
 		mSprite.setPosition(startPosition);
-		mSprite.setRotation(0.0f);
+		mSprite.setRotation(sf::degrees(0.f));
 		mSprite.setScale(sf::Vector2f(0.75f, 0.75f));
 	}
 
@@ -59,7 +60,7 @@ public:
 	virtual void Update(float deltaTime) = 0;
 
 	virtual const sf::Sprite& GetSprite() const { return mSprite; }
-	void SetRotation(float spriteRotation) { mSprite.setRotation(spriteRotation); }
+	void SetRotation(float spriteRotation) { mSprite.setRotation(sf::degrees(spriteRotation)); }
 
 protected:
 	sf::Sprite mSprite;

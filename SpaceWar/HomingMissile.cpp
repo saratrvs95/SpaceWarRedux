@@ -42,11 +42,11 @@ void HomingMissile::Update(float deltaTime)
 	sf::Vector2f toTarget = targetPosition - mPhysics.mPosition;
 	sf::Normalize(toTarget);
 	
-	const float spriteRotation = mSprite.getRotation();
+	const float spriteRotation = mSprite.getRotation().asDegrees();
 	const sf::Vector2f forwardVector = sf::RotationToUnitVector(spriteRotation);
 	float cosineTheta = sf::DotProduct(toTarget, forwardVector);
 	float sineTheta = sqrt(1 - (cosineTheta * cosineTheta));
-	mSprite.rotate(sineTheta * mAngularSpeed * deltaTime);
+	mSprite.rotate(sf::degrees(sineTheta * mAngularSpeed * deltaTime));
 
 	const float steeringStrength = 200.f;
 	mPhysics.mVelocity += toTarget * steeringStrength;

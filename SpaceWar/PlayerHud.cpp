@@ -3,23 +3,29 @@
 #include <sstream>
 
 PlayerHud::PlayerHud(sf::Vector2i screenPosition)
+	:mHBTexture("Resources/assets/health_bar.png"),
+	mEBTexture("Resources/assets/power_bar.png"),
+	mRefillPackFont("Resources/fonts/GeneralFont.otf"),
+	mMissileTexture("Resources/assets/missile.png"),
+	mHealthBar(mHBTexture),
+	mEnergyBar(mEBTexture),
+	mRefillPackText(mRefillPackFont),
+	mMissile(mMissileTexture),
+	mMissileAmmoText(mRefillPackFont)
 {
 	mHudPosition = screenPosition;
 	mVerticalSpacing = sf::Vector2i(0, 48);
 	sf::Vector2i horizontalSpacing = sf::Vector2i(12, 0);
-	if (mHBTexture.loadFromFile("Resources/assets/health_bar.png"))
+
 	{
-		mHealthBar.setTexture(mHBTexture);
 		mHealthBar.setPosition((sf::Vector2f)mHudPosition);
 		mHealthBar.setOrigin(sf::Vector2f(24, 24));
 		sf::IntRect textureRect(sf::Vector2i(), sf::Vector2i(48, 48));
 		mHealthBar.setTextureRect(textureRect);
 		mHealthBar.setScale(sf::Vector2f(4, 4));
 	}
-	
-	if (mEBTexture.loadFromFile("Resources/assets/power_bar.png"))
+
 	{
-		mEnergyBar.setTexture(mEBTexture);
 		mEnergyBar.setPosition((sf::Vector2f)(mHudPosition + mVerticalSpacing));
 		mEnergyBar.setOrigin(sf::Vector2f(24, 24));
 		sf::IntRect textureRect(sf::Vector2i(), sf::Vector2i(48, 48));
@@ -27,36 +33,31 @@ PlayerHud::PlayerHud(sf::Vector2i screenPosition)
 		mEnergyBar.setScale(sf::Vector2f(4, 4));
 	}
 
-	if (mRefillPackFont.loadFromFile("Resources/fonts/GeneralFont.otf"))
 	{
-		mRefillPackText.setFont(mRefillPackFont);
 		// got the color value from Paint
 		mRefillPackText.setFillColor(sf::Color(2, 153, 192));
 		mRefillPackText.setCharacterSize(24);
 		mRefillPackText.setPosition((sf::Vector2f)(mHudPosition + mVerticalSpacing + sf::Vector2i(84, -12)));
 
-		sf::Vector2f bounds = sf::Vector2f(mRefillPackText.getLocalBounds().width, mRefillPackText.getLocalBounds().height);
+		sf::Vector2f bounds = mRefillPackText.getLocalBounds().size;
 		mRefillPackText.setOrigin(bounds / 2.0f);
-		
+
 		mRefillPackText.setString("");
 	}
 
-	if (mMissileTexture.loadFromFile("Resources/assets/missile.png"))
 	{
-		mMissile.setTexture(mMissileTexture);
 		mMissile.setPosition((sf::Vector2f)(mHudPosition + sf::Vector2i(84, 0)));
 		mMissile.setOrigin(sf::Vector2f(24, 24));
 		sf::IntRect textureRect(sf::Vector2i(), sf::Vector2i(48, 48));
 		mMissile.setTextureRect(textureRect);
 		mMissile.setScale(sf::Vector2f(1.5f, 1.5f));
 
-		mMissileAmmoText.setFont(mRefillPackFont);
 		// got the color value from Paint
 		mMissileAmmoText.setFillColor(sf::Color(2, 153, 192));
 		mMissileAmmoText.setCharacterSize(24);
 		mMissileAmmoText.setPosition((sf::Vector2f)(mHudPosition + horizontalSpacing + sf::Vector2i(84, -12)));
 
-		sf::Vector2f bounds = sf::Vector2f(mMissileAmmoText.getLocalBounds().width, mMissileAmmoText.getLocalBounds().height);
+		sf::Vector2f bounds = mMissileAmmoText.getLocalBounds().size;
 		mMissileAmmoText.setOrigin(bounds / 2.0f);
 
 		mMissileAmmoText.setString("");

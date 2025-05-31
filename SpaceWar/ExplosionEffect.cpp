@@ -1,4 +1,5 @@
 #include "ExplosionEffect.h"
+#include "SFML/Graphics/Sprite.hpp"
 #include "Game.h"
 
 void ExplosionEffect::Init()

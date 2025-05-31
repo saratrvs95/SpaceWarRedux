@@ -4,16 +4,24 @@
 #include <vector>
 #include <ctime>
 #include "GameState.h"
+#include <iostream>
 
 int main()
 {
 	std::srand(static_cast<unsigned>(time(NULL)));
-
-	GameState state;
-	state.Initialize();
-	while (state.IsWIndowOpen())
+	sf::RenderWindow gRenderWindow = sf::RenderWindow();
+	try
 	{
-		state.Tick();
+		GameState state(gRenderWindow);
+		state.Initialize();
+		while (state.IsWIndowOpen())
+		{
+			state.Tick();
+		}
+	}
+	catch (sf::Exception exception)
+	{
+		std::cout << exception.what() << std::endl;
 	}
 	return 0;
 }
